@@ -1,120 +1,72 @@
-# System Patterns: Next.js Starter Template
+# System Patterns: Companies Act 2013 Calculators
 
 ## Architecture Overview
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── layout.tsx          # Root layout + metadata
-│   ├── page.tsx            # Home page
-│   ├── globals.css         # Tailwind imports + global styles
-│   └── favicon.ico         # Site icon
-└── (expand as needed)
-    ├── components/         # React components (add when needed)
-    ├── lib/                # Utilities and helpers (add when needed)
-    └── db/                 # Database files (add via recipe)
+├── app/
+│   ├── layout.tsx                        # Root layout with nav bar
+│   ├── page.tsx                          # Dashboard with calculator cards
+│   ├── globals.css                       # Tailwind imports
+│   └── calculators/
+│       ├── csr/page.tsx                  # Section 135 CSR
+│       ├── depreciation/page.tsx         # Schedule II Depreciation
+│       ├── managerial-remuneration/      # Section 197/Schedule V
+│       ├── net-profit/page.tsx           # Section 198
+│       ├── dividend/page.tsx             # Section 123
+│       ├── buyback/page.tsx              # Section 68
+│       ├── related-party/page.tsx        # Section 188
+│       ├── board-composition/page.tsx    # Section 149
+│       ├── director-fee/page.tsx         # Section 197
+│       ├── reserves-surplus/page.tsx     # Section 123
+│       └── deposits/page.tsx            # Section 73
+├── types/
+│   └── calculations.ts                   # All TypeScript interfaces
+└── lib/
+    └── calculations/
+        └── index.ts                      # All calculation functions + utilities
 ```
 
 ## Key Design Patterns
 
-### 1. App Router Pattern
+### 1. Calculation Separation Pattern
+Each calculator has:
+- **Type definition** in `src/types/calculations.ts` (Inputs + Outputs interfaces)
+- **Calculation function** in `src/lib/calculations/index.ts` (pure functions, no side effects)
+- **UI page** in `src/app/calculators/[name]/page.tsx` (Client Component with state)
 
-Uses Next.js App Router with file-based routing:
-```
-src/app/
-├── page.tsx           # Route: /
-├── about/page.tsx     # Route: /about
-├── blog/
-│   ├── page.tsx       # Route: /blog
-│   └── [slug]/page.tsx # Route: /blog/:slug
-└── api/
-    └── route.ts       # API Route: /api
-```
+### 2. Client-Side State Pattern
+All calculator pages use:
+- `useState` for inputs and results
+- Pure calculation functions (no API calls)
+- `useCallback` for field update handlers where performance matters
 
-### 2. Component Organization Pattern (When Expanding)
+### 3. Result Display Pattern
+Each calculator follows the same visual pattern:
+- Left column: Input fields with labels
+- Right column: Result rows with `ResultRow` component
+- Compliance results use green/red color coding
+- Non-compliance results use blue highlight
+- Statutory reference box at bottom of results
 
-```
-src/components/
-├── ui/                # Reusable UI components (Button, Card, etc.)
-├── layout/            # Layout components (Header, Footer)
-├── sections/          # Page sections (Hero, Features, etc.)
-└── forms/             # Form components
-```
-
-### 3. Server Components by Default
-
-All components are Server Components unless marked with `"use client"`:
-```tsx
-// Server Component (default) - can fetch data, access DB
-export default function Page() {
-  return <div>Server rendered</div>;
-}
-
-// Client Component - for interactivity
-"use client";
-export default function Counter() {
-  const [count, setCount] = useState(0);
-  return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
-}
-```
-
-### 4. Layout Pattern
-
-Layouts wrap pages and can be nested:
-```tsx
-// src/app/layout.tsx - Root layout
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
-}
-
-// src/app/dashboard/layout.tsx - Nested layout
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex">
-      <Sidebar />
-      <main>{children}</main>
-    </div>
-  );
-}
-```
+### 4. Form Pattern
+- Number inputs with `type="number"`
+- Empty string as placeholder (not "0")
+- `parseFloat(value) || 0` for safe parsing
+- No form validation blocking (values default to 0)
 
 ## Styling Conventions
 
-### Tailwind CSS Usage
-- Utility classes directly on elements
-- Component composition for repeated patterns
-- Responsive: `sm:`, `md:`, `lg:`, `xl:`
-
-### Common Patterns
-```tsx
-// Container
-<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-// Responsive grid
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-// Flexbox centering
-<div className="flex items-center justify-center">
-```
+- Dark theme: `bg-neutral-950`, `bg-neutral-800/50`, `border-neutral-700`
+- Blue accent: `bg-blue-600`, `text-blue-400`, `border-blue-500/30`
+- Green success: `bg-green-600/10`, `text-green-400`, `border-green-500/30`
+- Red failure: `bg-red-600/10`, `text-red-400`, `border-red-500/30`
+- Yellow warning: `bg-yellow-600/10`, `text-yellow-400`, `border-yellow-500/30`
+- Input style: `bg-neutral-800 border-neutral-700 rounded-lg px-3 py-2`
 
 ## File Naming Conventions
 
-- Components: PascalCase (`Button.tsx`, `Header.tsx`)
-- Utilities: camelCase (`utils.ts`, `helpers.ts`)
-- Pages/Routes: lowercase (`page.tsx`, `layout.tsx`)
-- Directories: kebab-case (`api-routes/`) or lowercase (`components/`)
-
-## State Management
-
-For simple needs:
-- `useState` for local component state
-- `useContext` for shared state
-- Server Components for data fetching
-
-For complex needs (add when necessary):
-- Zustand for client state
-- React Query for server state
+- Calculator pages: kebab-case directory (`board-composition/`)
+- All pages: `page.tsx`
+- Types: descriptive interfaces with `Inputs`/`Outputs` suffixes
+- Functions: `calculate[Name]` naming pattern

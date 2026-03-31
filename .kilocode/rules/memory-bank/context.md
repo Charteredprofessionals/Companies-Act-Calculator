@@ -1,87 +1,67 @@
-# Active Context: Next.js Starter Template
+# Active Context: Companies Act 2013 Calculators
 
 ## Current State
 
-**Template Status**: ✅ Ready for development
+**Status**: ✅ All 11 calculators implemented and passing typecheck/lint
 
-The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
+The application is a fully functional Companies Act 2013 compliance calculator webapp with 11 statutory calculators, a searchable dashboard, and professional dark theme.
 
 ## Recently Completed
 
 - [x] Base Next.js 16 setup with App Router
-- [x] TypeScript configuration with strict mode
-- [x] Tailwind CSS 4 integration
-- [x] ESLint configuration
-- [x] Memory bank documentation
-- [x] Recipe system for common features
+- [x] TypeScript type definitions for all 11 calculators
+- [x] Calculation engine in `src/lib/calculations/index.ts`
+- [x] Dashboard page with searchable calculator cards
+- [x] CSR Expenditure Calculator (Section 135)
+- [x] Depreciation Calculator (Schedule II)
+- [x] Managerial Remuneration Calculator (Section 197/Schedule V)
+- [x] Net Profit Calculator (Section 198)
+- [x] Dividend Calculator (Section 123)
+- [x] Buyback of Shares Calculator (Section 68)
+- [x] Related Party Transactions Calculator (Section 188)
+- [x] Board Composition Calculator (Section 149)
+- [x] Director Fee Calculator (Section 197)
+- [x] Reserves & Surplus Calculator (Section 123)
+- [x] Deposits Calculator (Section 73)
+- [x] Updated memory bank documentation
+- [x] TypeScript typecheck passes
+- [x] ESLint passes
 
 ## Current Structure
 
 | File/Directory | Purpose | Status |
-|----------------|---------|--------|
-| `src/app/page.tsx` | Home page | ✅ Ready |
-| `src/app/layout.tsx` | Root layout | ✅ Ready |
-| `src/app/globals.css` | Global styles | ✅ Ready |
-| `.kilocode/` | AI context & recipes | ✅ Ready |
+|---|---|---|
+| `src/app/page.tsx` | Dashboard with 11 calculator cards | Complete |
+| `src/app/layout.tsx` | Root layout with nav bar | Complete |
+| `src/app/calculators/*/page.tsx` | 11 calculator pages | Complete |
+| `src/types/calculations.ts` | All TypeScript interfaces | Complete |
+| `src/lib/calculations/index.ts` | All calculation functions | Complete |
 
-## Current Focus
+## Calculator Coverage
 
-The template is ready. Next steps depend on user requirements:
-
-1. What type of application to build
-2. What features are needed
-3. Design/branding preferences
-
-## Quick Start Guide
-
-### To add a new page:
-
-Create a file at `src/app/[route]/page.tsx`:
-```tsx
-export default function NewPage() {
-  return <div>New page content</div>;
-}
-```
-
-### To add components:
-
-Create `src/components/` directory and add components:
-```tsx
-// src/components/ui/Button.tsx
-export function Button({ children }: { children: React.ReactNode }) {
-  return <button className="px-4 py-2 bg-blue-600 text-white rounded">{children}</button>;
-}
-```
-
-### To add a database:
-
-Follow `.kilocode/recipes/add-database.md`
-
-### To add API routes:
-
-Create `src/app/api/[route]/route.ts`:
-```tsx
-import { NextResponse } from "next/server";
-
-export async function GET() {
-  return NextResponse.json({ message: "Hello" });
-}
-```
-
-## Available Recipes
-
-| Recipe | File | Use Case |
-|--------|------|----------|
-| Add Database | `.kilocode/recipes/add-database.md` | Data persistence with Drizzle + SQLite |
-
-## Pending Improvements
-
-- [ ] Add more recipes (auth, email, etc.)
-- [ ] Add example components
-- [ ] Add testing setup recipe
+| Section | Calculator | Status |
+|---|---|---|
+| Section 135 | CSR Expenditure | Complete |
+| Schedule II | Depreciation (SLM/WDV) | Complete |
+| Section 197/Schedule V | Managerial Remuneration | Complete |
+| Section 198 | Net Profit | Complete |
+| Section 123 | Dividend | Complete |
+| Section 68 | Buyback of Shares | Complete |
+| Section 188 | Related Party Transactions | Complete |
+| Section 149 | Board Composition | Complete |
+| Section 197 | Director Fee | Complete |
+| Section 123 | Reserves & Surplus | Complete |
+| Section 73 | Deposits | Complete |
 
 ## Session History
 
 | Date | Changes |
-|------|---------|
-| Initial | Template created with base setup |
+|---|---|
+| 2026-03-31 | Built complete Companies Act 2013 calculator webapp with 11 calculators |
+
+## Pending Improvements
+
+- [ ] PDF export functionality
+- [ ] Multi-company comparison mode
+- [ ] Additional calculators (Auditor rotation, Insider trading limits, etc.)
+- [ ] Save/load calculation history (requires database)
