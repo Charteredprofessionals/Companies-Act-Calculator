@@ -4,6 +4,19 @@ import { useState } from "react";
 import Link from "next/link";
 import { calculateBoardComposition } from "@/lib/calculations";
 import type { BoardCompositionInputs, CompanyType } from "@/types/calculations";
+import {
+  ResultRow,
+  Tooltip,
+  FormulaDisplay,
+  ReferenceSection,
+  Interpretation,
+  StatutoryDisclaimer,
+  ComplianceStatus,
+  PrintButton,
+} from "@/components";
+import { calculatorMeta } from "@/lib/calculations/metadata";
+
+const meta = calculatorMeta["board-composition"];
 
 export default function BoardCompositionPage() {
   const [inputs, setInputs] = useState<BoardCompositionInputs>({
@@ -46,13 +59,13 @@ export default function BoardCompositionPage() {
       <Link href="/" className="text-sm text-neutral-400 hover:text-white">
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
       <h1 className="text-3xl font-bold mt-4 mb-1">
-        Board Composition Calculator
+        {meta.title}
       </h1>
       <p className="text-neutral-400 mb-8">
-        Section 149 &mdash; Check director requirements & independent director
-        count
+        {meta.section} &mdash; {meta.description}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -61,7 +74,7 @@ export default function BoardCompositionPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Company Type
+              Company Type <Tooltip text={meta.inputTooltips.companyType} />
             </label>
             <select
               value={inputs.companyType}
@@ -82,13 +95,13 @@ export default function BoardCompositionPage() {
               className="w-4 h-4 rounded bg-neutral-800 border-neutral-700"
             />
             <label htmlFor="isListed" className="text-sm text-neutral-400">
-              Listed Company
+              Listed Company <Tooltip text={meta.inputTooltips.isListed} />
             </label>
           </div>
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Paid-up Share Capital
+              Paid-up Share Capital <Tooltip text={meta.inputTooltips.paidUpShareCapital} />
             </label>
             <input
               type="number"
@@ -102,7 +115,7 @@ export default function BoardCompositionPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Turnover
+              Turnover <Tooltip text={meta.inputTooltips.turnover} />
             </label>
             <input
               type="number"
@@ -114,7 +127,7 @@ export default function BoardCompositionPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Current Number of Directors
+              Current Number of Directors <Tooltip text={meta.inputTooltips.currentDirectors} />
             </label>
             <input
               type="number"
@@ -128,7 +141,7 @@ export default function BoardCompositionPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Current Independent/Non-Executive Directors
+              Current Independent/Non-Executive Directors <Tooltip text={meta.inputTooltips.nonExecutiveDirectors} />
             </label>
             <input
               type="number"
@@ -149,7 +162,7 @@ export default function BoardCompositionPage() {
               className="w-4 h-4 rounded bg-neutral-800 border-neutral-700"
             />
             <label htmlFor="womanDirector" className="text-sm text-neutral-400">
-              Has Woman Director
+              Has Woman Director <Tooltip text={meta.inputTooltips.womanDirector} />
             </label>
           </div>
 
@@ -167,7 +180,7 @@ export default function BoardCompositionPage() {
               htmlFor="residentDirector"
               className="text-sm text-neutral-400"
             >
-              Has Resident Director (182+ days in India)
+              Has Resident Director (182+ days in India) <Tooltip text={meta.inputTooltips.residentDirector} />
             </label>
           </div>
 
@@ -185,12 +198,8 @@ export default function BoardCompositionPage() {
           </h2>
           {result ? (
             <div className="space-y-4">
-              <ResultRow
-                label="Compliant?"
-                value={result.isCompliant ? "Yes" : "No"}
-                highlight
-                success={result.isCompliant}
-              />
+              <ComplianceStatus isCompliant={result.isCompliant} />
+
               <ResultRow
                 label="Minimum Directors"
                 value={result.minDirectors.toString()}
@@ -225,67 +234,24 @@ export default function BoardCompositionPage() {
                 </div>
               )}
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Section 149 of Companies Act, 2013</li>
-                  <li>Public: min 3, Private: min 2 directors</li>
-                  <li>Listed: at least 1 woman director</li>
-                  <li>At least 1 resident Indian director</li>
-                  <li>Listed/10Cr+ capital: 1/3rd independent directors</li>
-                </ul>
-              </div>
+              <Interpretation text={meta.interpretResult!(result)} />
+
+              <ReferenceSection
+                section={meta.references.section}
+                points={meta.references.points}
+              />
+
+              <FormulaDisplay title="Formulas" formulas={meta.formulas} />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
               Enter values and click calculate
             </div>
           )}
+
+          <StatutoryDisclaimer />
         </div>
       </div>
-    </div>
-  );
-}
-
-function ResultRow({
-  label,
-  value,
-  highlight,
-  success,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-  success?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? success !== undefined
-            ? success
-              ? "bg-green-600/10 border border-green-500/30"
-              : "bg-red-600/10 border border-red-500/30"
-            : "bg-blue-600/10 border border-blue-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span
-        className={`font-semibold ${
-          highlight
-            ? success !== undefined
-              ? success
-                ? "text-green-400"
-                : "text-red-400"
-              : "text-blue-400"
-            : "text-white"
-        }`}
-      >
-        {value}
-      </span>
     </div>
   );
 }

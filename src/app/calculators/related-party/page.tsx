@@ -4,6 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { calculateRelatedParty, formatCurrency } from "@/lib/calculations";
 import type { RelatedPartyInputs, RPTTransactionType } from "@/types/calculations";
+import {
+  ResultRow,
+  Tooltip,
+  FormulaDisplay,
+  ReferenceSection,
+  Interpretation,
+  StatutoryDisclaimer,
+  PrintButton,
+} from "@/components";
+import { calculatorMeta } from "@/lib/calculations/metadata";
+
+const meta = calculatorMeta["related-party"];
 
 const TRANSACTION_TYPES: { value: RPTTransactionType; label: string }[] = [
   { value: "sale_purchase", label: "Sale/Purchase of Goods" },
@@ -51,12 +63,13 @@ export default function RelatedPartyPage() {
       <Link href="/" className="text-sm text-neutral-400 hover:text-white">
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
       <h1 className="text-3xl font-bold mt-4 mb-1">
-        Related Party Transactions
+        {meta.title}
       </h1>
       <p className="text-neutral-400 mb-8">
-        Section 188 &mdash; Determine approval thresholds for RPTs
+        {meta.section} &mdash; {meta.description}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -65,7 +78,7 @@ export default function RelatedPartyPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Transaction Type
+              Transaction Type <Tooltip text={meta.inputTooltips.transactionType} />
             </label>
             <select
               value={inputs.transactionType}
@@ -84,7 +97,7 @@ export default function RelatedPartyPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Transaction Value
+              Transaction Value <Tooltip text={meta.inputTooltips.transactionValue} />
             </label>
             <input
               type="number"
@@ -98,7 +111,7 @@ export default function RelatedPartyPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Paid-up Share Capital
+              Paid-up Share Capital <Tooltip text={meta.inputTooltips.paidUpShareCapital} />
             </label>
             <input
               type="number"
@@ -112,7 +125,7 @@ export default function RelatedPartyPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Turnover (Latest FY)
+              Turnover (Latest FY) <Tooltip text={meta.inputTooltips.turnover} />
             </label>
             <input
               type="number"
@@ -124,7 +137,7 @@ export default function RelatedPartyPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Company Type
+              Company Type <Tooltip text={meta.inputTooltips.companyType} />
             </label>
             <select
               value={inputs.companyType}
@@ -171,67 +184,24 @@ export default function RelatedPartyPage() {
                 highlight={result.exceedsThreshold}
               />
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Section 188 of Companies Act, 2013</li>
-                  <li>All RPTs require Board approval</li>
-                  <li>Shareholder approval if exceeds 10% of turnover/capital</li>
-                  <li>Ordinary resolution required for shareholder approval</li>
-                  <li>Interested parties cannot vote</li>
-                </ul>
-              </div>
+              <Interpretation text={meta.interpretResult!(result)} />
+
+              <ReferenceSection
+                section={meta.references.section}
+                points={meta.references.points}
+              />
+
+              <FormulaDisplay title="Formulas" formulas={meta.formulas} />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
               Enter values and click calculate
             </div>
           )}
+
+          <StatutoryDisclaimer />
         </div>
       </div>
-    </div>
-  );
-}
-
-function ResultRow({
-  label,
-  value,
-  highlight,
-  success,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-  success?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? success !== undefined
-            ? success
-              ? "bg-yellow-600/10 border border-yellow-500/30"
-              : "bg-green-600/10 border border-green-500/30"
-            : "bg-blue-600/10 border border-blue-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span
-        className={`font-semibold ${
-          highlight
-            ? success !== undefined
-              ? success
-                ? "text-yellow-400"
-                : "text-green-400"
-              : "text-blue-400"
-            : "text-white"
-        }`}
-      >
-        {value}
-      </span>
     </div>
   );
 }

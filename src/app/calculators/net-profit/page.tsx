@@ -3,7 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { calculateNetProfit, formatCurrency } from "@/lib/calculations";
+import { calculatorMeta } from "@/lib/calculations/metadata";
+import {
+  ResultRow,
+  Tooltip,
+  FormulaDisplay,
+  ReferenceSection,
+  StatutoryDisclaimer,
+  PrintButton,
+} from "@/components";
 import type { NetProfitInputs } from "@/types/calculations";
+
+const meta = calculatorMeta["net-profit"];
 
 export default function NetProfitPage() {
   const [inputs, setInputs] = useState<NetProfitInputs>({
@@ -37,6 +48,7 @@ export default function NetProfitPage() {
       <Link href="/" className="text-sm text-neutral-400 hover:text-white">
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
       <h1 className="text-3xl font-bold mt-4 mb-1">
         Net Profit Calculator
@@ -53,7 +65,7 @@ export default function NetProfitPage() {
           </h2>
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Profit & Loss Account Balance
+              Profit & Loss Account Balance <Tooltip text={meta.inputTooltips.profitAndLoss} />
             </label>
             <input
               type="number"
@@ -77,7 +89,7 @@ export default function NetProfitPage() {
           ] as const).map(([field, label]) => (
             <div key={field}>
               <label className="block text-sm text-neutral-400 mb-1">
-                {label}
+                {label} <Tooltip text={meta.inputTooltips[field]} />
               </label>
               <input
                 type="number"
@@ -100,7 +112,7 @@ export default function NetProfitPage() {
           ] as const).map(([field, label]) => (
             <div key={field}>
               <label className="block text-sm text-neutral-400 mb-1">
-                {label}
+                {label} <Tooltip text={meta.inputTooltips[field]} />
               </label>
               <input
                 type="number"
@@ -134,12 +146,10 @@ export default function NetProfitPage() {
               <ResultRow
                 label="Total Add Backs"
                 value={formatCurrency(result.breakdown.totalAddbacks)}
-                className="text-green-400"
               />
               <ResultRow
                 label="Total Deductions"
                 value={formatCurrency(result.breakdown.totalDeductions)}
-                className="text-red-400"
               />
               <ResultRow
                 label="Net Profit (Section 198)"
@@ -147,18 +157,9 @@ export default function NetProfitPage() {
                 highlight
               />
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Section 198 of Companies Act, 2013</li>
-                  <li>Add back: Depreciation, Director fees, Interest</li>
-                  <li>Add back: Loss on sale of assets, Bad debt provision</li>
-                  <li>Deduct: Profit on sale of assets, Grants</li>
-                  <li>Used as base for managerial remuneration (Section 197)</li>
-                </ul>
-              </div>
+              <FormulaDisplay title="Formulas" formulas={meta.formulas} />
+              <ReferenceSection section={meta.references.section} points={meta.references.points} />
+              <StatutoryDisclaimer />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
@@ -167,37 +168,6 @@ export default function NetProfitPage() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ResultRow({
-  label,
-  value,
-  highlight,
-  className,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? "bg-blue-600/10 border border-blue-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span
-        className={`font-semibold ${
-          className ?? (highlight ? "text-blue-400" : "text-white")
-        }`}
-      >
-        {value}
-      </span>
     </div>
   );
 }

@@ -26,6 +26,7 @@ The application is a fully functional Companies Act 2013 compliance calculator w
 - [x] Updated memory bank documentation
 - [x] TypeScript typecheck passes
 - [x] ESLint passes
+- [x] Refactored director-fee, reserves-surplus, deposits pages to use shared components (ResultRow, Tooltip, ReferenceSection, FormulaDisplay, StatutoryDisclaimer, ComplianceStatus, Interpretation) and calculatorMeta from metadata
 
 ## Current Structure
 
@@ -36,6 +37,8 @@ The application is a fully functional Companies Act 2013 compliance calculator w
 | `src/app/calculators/*/page.tsx` | 11 calculator pages | Complete |
 | `src/types/calculations.ts` | All TypeScript interfaces | Complete |
 | `src/lib/calculations/index.ts` | All calculation functions | Complete |
+| `src/lib/calculations/metadata.ts` | Calculator metadata (formulas, references, tooltips) | Complete |
+| `src/components/` | Shared UI components (ResultRow, Tooltip, etc.) | Complete |
 
 ## Calculator Coverage
 
@@ -58,6 +61,7 @@ The application is a fully functional Companies Act 2013 compliance calculator w
 | Date | Changes |
 |---|---|
 | 2026-03-31 | Built complete Companies Act 2013 calculator webapp with 11 calculators |
+| 2026-03-31 | Refactored director-fee, reserves-surplus, deposits pages to use shared components and calculatorMeta |
 
 ## Pending Improvements
 

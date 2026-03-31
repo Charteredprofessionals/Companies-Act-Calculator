@@ -4,6 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { calculateDividend, formatCurrency } from "@/lib/calculations";
 import type { DividendInputs } from "@/types/calculations";
+import {
+  ResultRow,
+  Tooltip,
+  FormulaDisplay,
+  ReferenceSection,
+  Interpretation,
+  StatutoryDisclaimer,
+  PrintButton,
+} from "@/components";
+import { calculatorMeta } from "@/lib/calculations/metadata";
+
+const meta = calculatorMeta["dividend"];
 
 export default function DividendPage() {
   const [inputs, setInputs] = useState<DividendInputs>({
@@ -33,10 +45,11 @@ export default function DividendPage() {
       <Link href="/" className="text-sm text-neutral-400 hover:text-white">
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
-      <h1 className="text-3xl font-bold mt-4 mb-1">Dividend Calculator</h1>
+      <h1 className="text-3xl font-bold mt-4 mb-1">{meta.title}</h1>
       <p className="text-neutral-400 mb-8">
-        Section 123 &mdash; Calculate dividend from free reserves & capital
+        {meta.section} &mdash; {meta.description}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -46,6 +59,7 @@ export default function DividendPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Paid-up Share Capital
+              <Tooltip text={meta.inputTooltips.paidUpShareCapital} />
             </label>
             <input
               type="number"
@@ -58,6 +72,7 @@ export default function DividendPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Free Reserves
+              <Tooltip text={meta.inputTooltips.freeReserves} />
             </label>
             <input
               type="number"
@@ -70,6 +85,7 @@ export default function DividendPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Proposed Dividend Rate (%)
+              <Tooltip text={meta.inputTooltips.proposedDividendRate} />
             </label>
             <input
               type="number"
@@ -84,6 +100,7 @@ export default function DividendPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Depreciation Provided in Books
+              <Tooltip text={meta.inputTooltips.depreciationProvided} />
             </label>
             <input
               type="number"
@@ -98,6 +115,7 @@ export default function DividendPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Depreciation Required (Schedule II)
+              <Tooltip text={meta.inputTooltips.depreciationRequired} />
             </label>
             <input
               type="number"
@@ -112,6 +130,7 @@ export default function DividendPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Years of Unpaid/Unclaimed Dividend
+              <Tooltip text={meta.inputTooltips.unpaidDividendYears} />
             </label>
             <input
               type="number"
@@ -147,6 +166,7 @@ export default function DividendPage() {
                 label="Proposed Dividend Amount"
                 value={formatCurrency(result.proposedDividendAmount)}
                 highlight
+                formula="Capital x Dividend Rate%"
               />
               <ResultRow
                 label="Dividend Per Share"
@@ -160,19 +180,18 @@ export default function DividendPage() {
               <ResultRow
                 label="Maximum Dividend from Reserves"
                 value={formatCurrency(result.maximumDividend)}
+                formula="Free Reserves - Depreciation Shortfall"
               />
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Section 123 of Companies Act, 2013</li>
-                  <li>Dividend from free reserves after providing for depreciation</li>
-                  <li>Cannot declare if unpaid dividend exists for 3+ years</li>
-                  <li>Interim dividend: Only from profits of current year</li>
-                </ul>
-              </div>
+              {meta.interpretResult && (
+                <Interpretation text={meta.interpretResult(result)} />
+              )}
+              <FormulaDisplay title="Formulas" formulas={meta.formulas} />
+              <ReferenceSection
+                section={meta.references.section}
+                points={meta.references.points}
+              />
+              <StatutoryDisclaimer />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
@@ -181,47 +200,6 @@ export default function DividendPage() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ResultRow({
-  label,
-  value,
-  highlight,
-  success,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-  success?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? success !== undefined
-            ? success
-              ? "bg-green-600/10 border border-green-500/30"
-              : "bg-red-600/10 border border-red-500/30"
-            : "bg-blue-600/10 border border-blue-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span
-        className={`font-semibold ${
-          highlight
-            ? success !== undefined
-              ? success
-                ? "text-green-400"
-                : "text-red-400"
-              : "text-blue-400"
-            : "text-white"
-        }`}
-      >
-        {value}
-      </span>
     </div>
   );
 }

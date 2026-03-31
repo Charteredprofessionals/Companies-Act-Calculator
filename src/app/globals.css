@@ -1,1 +1,99 @@
 @import "tailwindcss";
+
+@media print {
+  /* Hide non-essential elements */
+  nav,
+  .no-print,
+  button,
+  input,
+  select,
+  a[href="/"] {
+    display: none !important;
+  }
+
+  /* Reset backgrounds for print */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+  }
+
+  /* Make content full width */
+  .max-w-4xl {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Convert dark theme to print-friendly */
+  .bg-neutral-950,
+  .bg-neutral-900,
+  .bg-neutral-800,
+  .bg-neutral-800\/50,
+  .bg-neutral-800\/80 {
+    background: white !important;
+  }
+
+  .text-white,
+  .text-neutral-200,
+  .text-neutral-300,
+  .text-neutral-400,
+  .text-neutral-500 {
+    color: black !important;
+  }
+
+  .border-neutral-700,
+  .border-neutral-800 {
+    border-color: #ccc !important;
+  }
+
+  /* Highlighted results */
+  .bg-blue-600\/10 {
+    background: #e8f0fe !important;
+  }
+  .bg-green-600\/10 {
+    background: #e6f4ea !important;
+  }
+  .bg-red-600\/10 {
+    background: #fce8e6 !important;
+  }
+  .bg-amber-900\/20 {
+    background: #fef3e0 !important;
+  }
+
+  .text-blue-400 {
+    color: #1a73e8 !important;
+  }
+  .text-green-400 {
+    color: #1e8e3e !important;
+  }
+  .text-red-400 {
+    color: #d93025 !important;
+  }
+  .text-amber-300,
+  .text-amber-300\/80 {
+    color: #b06000 !important;
+  }
+
+  /* Two column layout becomes single column for print */
+  .grid {
+    display: block !important;
+  }
+
+  .grid > div {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Add page break hints */
+  h1 {
+    page-break-after: avoid;
+  }
+
+  h2 {
+    page-break-after: avoid;
+  }
+
+  /* Ensure result rows stay together */
+  .space-y-4 > div {
+    page-break-inside: avoid;
+  }
+}

@@ -3,7 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import { calculateManagerialRemuneration, formatCurrency } from "@/lib/calculations";
+import { calculatorMeta } from "@/lib/calculations/metadata";
+import {
+  ResultRow,
+  Tooltip,
+  FormulaDisplay,
+  ReferenceSection,
+  Interpretation,
+  StatutoryDisclaimer,
+  ComplianceStatus,
+  PrintButton,
+} from "@/components";
 import type { ManagerialRemunerationInputs } from "@/types/calculations";
+
+const meta = calculatorMeta["managerial-remuneration"];
 
 export default function ManagerialRemunerationPage() {
   const [inputs, setInputs] = useState<ManagerialRemunerationInputs>({
@@ -36,6 +49,7 @@ export default function ManagerialRemunerationPage() {
       <Link href="/" className="text-sm text-neutral-400 hover:text-white">
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
       <h1 className="text-3xl font-bold mt-4 mb-1">
         Managerial Remuneration
@@ -51,7 +65,7 @@ export default function ManagerialRemunerationPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Net Profit (Section 198)
+              Net Profit (Section 198) <Tooltip text={meta.inputTooltips.netProfit} />
             </label>
             <input
               type="number"
@@ -63,7 +77,7 @@ export default function ManagerialRemunerationPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              MD/WTD Salary (Actual)
+              MD/WTD Salary (Actual) <Tooltip text={meta.inputTooltips.managingDirectorSalary} />
             </label>
             <input
               type="number"
@@ -77,7 +91,7 @@ export default function ManagerialRemunerationPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Other Executive Directors (Total Actual)
+              Other Executive Directors (Total Actual) <Tooltip text={meta.inputTooltips.otherExecutiveDirectors} />
             </label>
             <input
               type="number"
@@ -91,7 +105,7 @@ export default function ManagerialRemunerationPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Number of Other Executive Directors
+              Number of Other Executive Directors <Tooltip text={meta.inputTooltips.numOtherExecDirectors} />
             </label>
             <input
               type="number"
@@ -105,7 +119,7 @@ export default function ManagerialRemunerationPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Non-Executive Directors Fee (Total Actual)
+              Non-Executive Directors Fee (Total Actual) <Tooltip text={meta.inputTooltips.nonExecutiveDirectors} />
             </label>
             <input
               type="number"
@@ -119,7 +133,7 @@ export default function ManagerialRemunerationPage() {
 
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
-              Number of Non-Executive Directors
+              Number of Non-Executive Directors <Tooltip text={meta.inputTooltips.numNonExecDirectors} />
             </label>
             <input
               type="number"
@@ -145,27 +159,26 @@ export default function ManagerialRemunerationPage() {
           </h2>
           {result ? (
             <div className="space-y-4">
-              <ResultRow
-                label="Compliant?"
-                value={result.isCompliant ? "Yes" : "No"}
-                highlight
-                success={result.isCompliant}
-              />
+              <ComplianceStatus isCompliant={result.isCompliant} label="Managerial Remuneration" />
               <ResultRow
                 label="Max Total Remuneration (11%)"
                 value={formatCurrency(result.maxTotalRemuneration)}
+                formula="11% x Net Profit"
               />
               <ResultRow
                 label="Max MD/WTD (5%)"
                 value={formatCurrency(result.maxMDRemuneration)}
+                formula="5% x Net Profit"
               />
               <ResultRow
                 label="Max Other Exec Directors (1% each)"
                 value={formatCurrency(result.maxOtherExecRemuneration)}
+                formula="1% x Net Profit x No. of Directors"
               />
               <ResultRow
                 label="Max Non-Exec Directors (1% each)"
                 value={formatCurrency(result.maxNonExecRemuneration)}
+                formula="1% x Net Profit x No. of Directors"
               />
               <ResultRow
                 label="Actual Total Remuneration"
@@ -180,18 +193,12 @@ export default function ManagerialRemunerationPage() {
                 />
               )}
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Section 197 of Companies Act, 2013</li>
-                  <li>Maximum 11% of net profit for all directors combined</li>
-                  <li>MD/WTD: 5% of net profit</li>
-                  <li>Other directors: 1% each (max 3 non-exec)</li>
-                  <li>Schedule V for companies with no/inadequate profits</li>
-                </ul>
-              </div>
+              <FormulaDisplay title="Formulas" formulas={meta.formulas} />
+              <ReferenceSection section={meta.references.section} points={meta.references.points} />
+              {meta.interpretResult && (
+                <Interpretation text={meta.interpretResult(result)} />
+              )}
+              <StatutoryDisclaimer />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
@@ -200,43 +207,6 @@ export default function ManagerialRemunerationPage() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ResultRow({
-  label,
-  value,
-  highlight,
-  success,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-  success?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? success
-            ? "bg-green-600/10 border border-green-500/30"
-            : "bg-red-600/10 border border-red-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span
-        className={`font-semibold ${
-          highlight
-            ? success
-              ? "text-green-400"
-              : "text-red-400"
-            : "text-white"
-        }`}
-      >
-        {value}
-      </span>
     </div>
   );
 }

@@ -4,6 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { calculateReservesSurplus, formatCurrency } from "@/lib/calculations";
 import type { ReservesSurplusInputs } from "@/types/calculations";
+import {
+  ResultRow,
+  Tooltip,
+  ReferenceSection,
+  FormulaDisplay,
+  StatutoryDisclaimer,
+  PrintButton,
+} from "@/components";
+import { calculatorMeta } from "@/lib/calculations/metadata";
+
+const meta = calculatorMeta["reserves-surplus"];
 
 export default function ReservesSurplusPage() {
   const [inputs, setInputs] = useState<ReservesSurplusInputs>({
@@ -32,12 +43,11 @@ export default function ReservesSurplusPage() {
       <Link href="/" className="text-sm text-neutral-400 hover:text-white">
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
-      <h1 className="text-3xl font-bold mt-4 mb-1">
-        Reserves & Surplus Calculator
-      </h1>
+      <h1 className="text-3xl font-bold mt-4 mb-1">{meta.title}</h1>
       <p className="text-neutral-400 mb-8">
-        Section 123 &mdash; Track free reserves and restricted reserves
+        {meta.section} &mdash; {meta.description}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -47,6 +57,7 @@ export default function ReservesSurplusPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Opening Balance
+              <Tooltip text={meta.inputTooltips.openingBalance} />
             </label>
             <input
               type="number"
@@ -59,6 +70,7 @@ export default function ReservesSurplusPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Profit for the Year (Net)
+              <Tooltip text={meta.inputTooltips.profitForYear} />
             </label>
             <input
               type="number"
@@ -71,6 +83,7 @@ export default function ReservesSurplusPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Dividend Paid
+              <Tooltip text={meta.inputTooltips.dividendPaid} />
             </label>
             <input
               type="number"
@@ -83,6 +96,7 @@ export default function ReservesSurplusPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Transfer to Reserves (Statutory)
+              <Tooltip text={meta.inputTooltips.transferToReserves} />
             </label>
             <input
               type="number"
@@ -97,6 +111,7 @@ export default function ReservesSurplusPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Transfer from Reserves (Capitalization)
+              <Tooltip text={meta.inputTooltips.transferFromReserves} />
             </label>
             <input
               type="number"
@@ -111,6 +126,7 @@ export default function ReservesSurplusPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Other Adjustments (+/-)
+              <Tooltip text={meta.inputTooltips.otherAdjustments} />
             </label>
             <input
               type="number"
@@ -151,17 +167,12 @@ export default function ReservesSurplusPage() {
                 value={formatCurrency(result.restrictedReserves)}
               />
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Section 123 of Companies Act, 2013</li>
-                  <li>Free reserves: available for dividend/buyback</li>
-                  <li>Restricted reserves: earmarked for specific purposes</li>
-                  <li>Statutory transfers as per applicable rules</li>
-                </ul>
-              </div>
+              <FormulaDisplay title="Formulas" formulas={meta.formulas} />
+              <ReferenceSection
+                section={meta.references.section}
+                points={meta.references.points}
+              />
+              <StatutoryDisclaimer />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
@@ -170,33 +181,6 @@ export default function ReservesSurplusPage() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ResultRow({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? "bg-blue-600/10 border border-blue-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span
-        className={`font-semibold ${highlight ? "text-blue-400" : "text-white"}`}
-      >
-        {value}
-      </span>
     </div>
   );
 }

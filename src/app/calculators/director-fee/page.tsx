@@ -4,6 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { calculateDirectorFee, formatCurrency } from "@/lib/calculations";
 import type { DirectorFeeInputs } from "@/types/calculations";
+import {
+  ResultRow,
+  Tooltip,
+  ReferenceSection,
+  FormulaDisplay,
+  StatutoryDisclaimer,
+  PrintButton,
+} from "@/components";
+import { calculatorMeta } from "@/lib/calculations/metadata";
+
+const meta = calculatorMeta["director-fee"];
 
 export default function DirectorFeePage() {
   const [inputs, setInputs] = useState<DirectorFeeInputs>({
@@ -39,11 +50,11 @@ export default function DirectorFeePage() {
       <Link href="/" className="text-sm text-neutral-400 hover:text-white">
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
-      <h1 className="text-3xl font-bold mt-4 mb-1">Director Fee Calculator</h1>
+      <h1 className="text-3xl font-bold mt-4 mb-1">{meta.title}</h1>
       <p className="text-neutral-400 mb-8">
-        Section 197 &mdash; Calculate sitting fees for board & committee
-        meetings
+        {meta.section} &mdash; {meta.description}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -53,6 +64,7 @@ export default function DirectorFeePage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Number of Board Meetings (per year)
+              <Tooltip text={meta.inputTooltips.numberOfBoardMeetings} />
             </label>
             <input
               type="number"
@@ -67,6 +79,7 @@ export default function DirectorFeePage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Number of Committee Meetings (per year)
+              <Tooltip text={meta.inputTooltips.numberOfCommitteeMeetings} />
             </label>
             <input
               type="number"
@@ -81,6 +94,7 @@ export default function DirectorFeePage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Fee per Board Meeting
+              <Tooltip text={meta.inputTooltips.feePerBoardMeeting} />
             </label>
             <input
               type="number"
@@ -95,6 +109,7 @@ export default function DirectorFeePage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Fee per Committee Meeting
+              <Tooltip text={meta.inputTooltips.feePerCommitteeMeeting} />
             </label>
             <input
               type="number"
@@ -109,6 +124,7 @@ export default function DirectorFeePage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Company Type
+              <Tooltip text={meta.inputTooltips.isListed} />
             </label>
             <select
               value={inputs.isListed ? "true" : "false"}
@@ -125,6 +141,7 @@ export default function DirectorFeePage() {
               <div>
                 <label className="block text-sm text-neutral-400 mb-1">
                   Turnover
+                  <Tooltip text={meta.inputTooltips.turnover} />
                 </label>
                 <input
                   type="number"
@@ -174,17 +191,12 @@ export default function DirectorFeePage() {
                 value={result.feeCapApplicable ? "Yes (Listed)" : "No"}
               />
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Section 197 of Companies Act, 2013</li>
-                  <li>Sitting fees paid to non-executive directors</li>
-                  <li>Min 1 board meeting per quarter required</li>
-                  <li>Listed companies have fee caps based on turnover</li>
-                </ul>
-              </div>
+              <FormulaDisplay title="Formulas" formulas={meta.formulas} />
+              <ReferenceSection
+                section={meta.references.section}
+                points={meta.references.points}
+              />
+              <StatutoryDisclaimer />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
@@ -193,33 +205,6 @@ export default function DirectorFeePage() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ResultRow({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? "bg-blue-600/10 border border-blue-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span
-        className={`font-semibold ${highlight ? "text-blue-400" : "text-white"}`}
-      >
-        {value}
-      </span>
     </div>
   );
 }

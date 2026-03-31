@@ -4,6 +4,19 @@ import { useState } from "react";
 import Link from "next/link";
 import { calculateBuyback, formatCurrency } from "@/lib/calculations";
 import type { BuybackInputs } from "@/types/calculations";
+import {
+  ResultRow,
+  Tooltip,
+  ComplianceStatus,
+  FormulaDisplay,
+  ReferenceSection,
+  Interpretation,
+  StatutoryDisclaimer,
+  PrintButton,
+} from "@/components";
+import { calculatorMeta } from "@/lib/calculations/metadata";
+
+const meta = calculatorMeta["buyback"];
 
 export default function BuybackPage() {
   const [inputs, setInputs] = useState<BuybackInputs>({
@@ -33,10 +46,11 @@ export default function BuybackPage() {
       <Link href="/" className="text-sm text-neutral-400 hover:text-white">
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
-      <h1 className="text-3xl font-bold mt-4 mb-1">Buyback of Shares</h1>
+      <h1 className="text-3xl font-bold mt-4 mb-1">{meta.title}</h1>
       <p className="text-neutral-400 mb-8">
-        Section 68 &mdash; Verify 25% limit & debt-equity ratio compliance
+        {meta.section} &mdash; {meta.description}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -46,6 +60,7 @@ export default function BuybackPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Paid-up Equity Capital
+              <Tooltip text={meta.inputTooltips.paidUpEquityCapital} />
             </label>
             <input
               type="number"
@@ -60,6 +75,7 @@ export default function BuybackPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Free Reserves
+              <Tooltip text={meta.inputTooltips.freeReserves} />
             </label>
             <input
               type="number"
@@ -72,6 +88,7 @@ export default function BuybackPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Securities Premium Account
+              <Tooltip text={meta.inputTooltips.securitiesPremium} />
             </label>
             <input
               type="number"
@@ -86,6 +103,7 @@ export default function BuybackPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Total Debt (Borrowings)
+              <Tooltip text={meta.inputTooltips.totalDebt} />
             </label>
             <input
               type="number"
@@ -98,6 +116,7 @@ export default function BuybackPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Number of Shares Outstanding
+              <Tooltip text={meta.inputTooltips.numberOfSharesOutstanding} />
             </label>
             <input
               type="number"
@@ -112,6 +131,7 @@ export default function BuybackPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Buyback Price (per share)
+              <Tooltip text={meta.inputTooltips.buybackPrice} />
             </label>
             <input
               type="number"
@@ -124,6 +144,7 @@ export default function BuybackPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Number of Shares to Buyback
+              <Tooltip text={meta.inputTooltips.numberOfSharesToBuyback} />
             </label>
             <input
               type="number"
@@ -149,20 +170,20 @@ export default function BuybackPage() {
           </h2>
           {result ? (
             <div className="space-y-4">
-              <ResultRow
-                label="Compliant?"
-                value={result.isCompliant ? "Yes" : "No"}
-                highlight
-                success={result.isCompliant}
+              <ComplianceStatus
+                isCompliant={result.isCompliant}
+                label="Section 68 compliance check"
               />
               <ResultRow
                 label="Max Buyback (25% of capital + reserves)"
                 value={formatCurrency(result.maxBuybackFromCapitalReserves)}
+                formula="25% x (Capital + Reserves + Premium)"
               />
               <ResultRow
                 label="Proposed Buyback Value"
                 value={formatCurrency(result.proposedBuybackValue)}
                 highlight
+                formula="Price x Shares to Buyback"
               />
               <ResultRow
                 label="Within 25% Limit?"
@@ -172,6 +193,7 @@ export default function BuybackPage() {
               <ResultRow
                 label="Debt-Equity Ratio After Buyback"
                 value={`${result.debtEquityRatioAfterBuyback.toFixed(2)} : 1`}
+                formula="Total Debt / Net Worth (post-buyback)"
               />
               <ResultRow
                 label="Debt-Equity Compliant? (max 2:1)"
@@ -179,18 +201,15 @@ export default function BuybackPage() {
                 success={result.isDebtEquityCompliant}
               />
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Section 68 of Companies Act, 2013</li>
-                  <li>Max 25% of paid-up capital + free reserves</li>
-                  <li>Debt-equity ratio must not exceed 2:1 post-buyback</li>
-                  <li>Buyback must be completed within 12 months</li>
-                  <li>Free reserves must be created equal to buyback value</li>
-                </ul>
-              </div>
+              {meta.interpretResult && (
+                <Interpretation text={meta.interpretResult(result)} />
+              )}
+              <FormulaDisplay title="Formulas" formulas={meta.formulas} />
+              <ReferenceSection
+                section={meta.references.section}
+                points={meta.references.points}
+              />
+              <StatutoryDisclaimer />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
@@ -199,47 +218,6 @@ export default function BuybackPage() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ResultRow({
-  label,
-  value,
-  highlight,
-  success,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-  success?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? success !== undefined
-            ? success
-              ? "bg-green-600/10 border border-green-500/30"
-              : "bg-red-600/10 border border-red-500/30"
-            : "bg-blue-600/10 border border-blue-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span
-        className={`font-semibold ${
-          highlight
-            ? success !== undefined
-              ? success
-                ? "text-green-400"
-                : "text-red-400"
-              : "text-blue-400"
-            : "text-white"
-        }`}
-      >
-        {value}
-      </span>
     </div>
   );
 }

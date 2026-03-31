@@ -3,11 +3,23 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  ResultRow,
+  FormulaDisplay,
+  ReferenceSection,
+  Interpretation,
+  StatutoryDisclaimer,
+  Tooltip,
+  PrintButton,
+} from "@/components";
+import {
   calculateDepreciation,
   formatCurrency,
   ASSET_CLASSES,
 } from "@/lib/calculations";
+import { calculatorMeta } from "@/lib/calculations/metadata";
 import type { DepreciationAsset, DepreciationOutputs, AssetClass } from "@/types/calculations";
+
+const meta = calculatorMeta["depreciation"];
 
 export default function DepreciationPage() {
   const [method, setMethod] = useState<"SLM" | "WDV">("WDV");
@@ -38,6 +50,7 @@ export default function DepreciationPage() {
       >
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
       <h1 className="text-3xl font-bold mt-4 mb-1">
         Depreciation Calculator
@@ -54,6 +67,7 @@ export default function DepreciationPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Asset Class
+              <Tooltip text={meta.inputTooltips.assetClass} />
             </label>
             <select
               value={assetClass}
@@ -71,6 +85,7 @@ export default function DepreciationPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Method
+              <Tooltip text={meta.inputTooltips.method} />
             </label>
             <div className="flex gap-3">
               {(["WDV", "SLM"] as const).map((m) => (
@@ -94,6 +109,7 @@ export default function DepreciationPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Cost of Asset
+              <Tooltip text={meta.inputTooltips.cost} />
             </label>
             <input
               type="number"
@@ -107,6 +123,7 @@ export default function DepreciationPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Residual Value (%)
+              <Tooltip text={meta.inputTooltips.residualValuePercent} />
             </label>
             <input
               type="number"
@@ -125,6 +142,8 @@ export default function DepreciationPage() {
           >
             Calculate Depreciation
           </button>
+
+          <FormulaDisplay title="Formulas" formulas={meta.formulas} />
         </div>
 
         <div>
@@ -151,17 +170,12 @@ export default function DepreciationPage() {
                 value={formatCurrency(result.wdvAfterDepreciation)}
               />
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Schedule II of Companies Act, 2013</li>
-                  <li>WDV Method: Dep = (Cost - Accum. Dep) x Rate</li>
-                  <li>SLM Method: Dep = (Cost - Residual) / Useful Life</li>
-                  <li>Residual value typically 5% of original cost</li>
-                </ul>
-              </div>
+              <Interpretation text={meta.interpretResult!(result)} />
+
+              <ReferenceSection
+                section={meta.references.section}
+                points={meta.references.points}
+              />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
@@ -170,33 +184,8 @@ export default function DepreciationPage() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
 
-function ResultRow({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? "bg-blue-600/10 border border-blue-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span
-        className={`font-semibold ${highlight ? "text-blue-400" : "text-white"}`}
-      >
-        {value}
-      </span>
+      <StatutoryDisclaimer />
     </div>
   );
 }

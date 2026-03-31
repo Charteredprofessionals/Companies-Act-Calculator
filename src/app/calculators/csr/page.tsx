@@ -2,8 +2,20 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import {
+  ResultRow,
+  FormulaDisplay,
+  ReferenceSection,
+  Interpretation,
+  StatutoryDisclaimer,
+  Tooltip,
+  PrintButton,
+} from "@/components";
 import { calculateCSR, formatCurrency } from "@/lib/calculations";
+import { calculatorMeta } from "@/lib/calculations/metadata";
 import type { CSRInputs, CSROutputs } from "@/types/calculations";
+
+const meta = calculatorMeta["csr"];
 
 export default function CSRPage() {
   const [inputs, setInputs] = useState<CSRInputs>({
@@ -34,6 +46,7 @@ export default function CSRPage() {
       >
         &larr; Back to all calculators
       </Link>
+      <div className="flex justify-end mt-2"><PrintButton /></div>
 
       <h1 className="text-3xl font-bold mt-4 mb-1">
         CSR Expenditure Calculator
@@ -50,6 +63,7 @@ export default function CSRPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Net Profit &mdash; Year 1 (Most Recent)
+              <Tooltip text={meta.inputTooltips.netProfitYear1} />
             </label>
             <input
               type="number"
@@ -63,6 +77,7 @@ export default function CSRPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Net Profit &mdash; Year 2
+              <Tooltip text={meta.inputTooltips.netProfitYear2} />
             </label>
             <input
               type="number"
@@ -76,6 +91,7 @@ export default function CSRPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Net Profit &mdash; Year 3
+              <Tooltip text={meta.inputTooltips.netProfitYear3} />
             </label>
             <input
               type="number"
@@ -89,6 +105,7 @@ export default function CSRPage() {
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
               Existing CSR Unspent Amount (from previous year)
+              <Tooltip text={meta.inputTooltips.existingCSRUnspent} />
             </label>
             <input
               type="number"
@@ -107,6 +124,8 @@ export default function CSRPage() {
           >
             Calculate CSR Obligation
           </button>
+
+          <FormulaDisplay title="Formulas" formulas={meta.formulas} />
         </div>
 
         <div>
@@ -143,17 +162,12 @@ export default function CSRPage() {
                 value={result.needsCSRCommittee ? "Yes (obligation >= 50L)" : "No"}
               />
 
-              <div className="mt-6 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <h3 className="text-sm font-semibold text-neutral-300 mb-2">
-                  Reference
-                </h3>
-                <ul className="text-xs text-neutral-400 space-y-1">
-                  <li>Section 135 of Companies Act, 2013</li>
-                  <li>CSR applicable if net worth {">="} 500 Cr, or turnover {">="} 1000 Cr, or net profit {">="} 5 Cr</li>
-                  <li>2% of average net profits of preceding 3 financial years</li>
-                  <li>CSR Committee required if obligation {">="} 50 lakhs</li>
-                </ul>
-              </div>
+              <Interpretation text={meta.interpretResult!(result)} />
+
+              <ReferenceSection
+                section={meta.references.section}
+                points={meta.references.points}
+              />
             </div>
           ) : (
             <div className="text-neutral-500 text-sm">
@@ -162,31 +176,8 @@ export default function CSRPage() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
 
-function ResultRow({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-        highlight
-          ? "bg-blue-600/10 border border-blue-500/30"
-          : "bg-neutral-800/50"
-      }`}
-    >
-      <span className="text-sm text-neutral-400">{label}</span>
-      <span className={`font-semibold ${highlight ? "text-blue-400" : "text-white"}`}>
-        {value}
-      </span>
+      <StatutoryDisclaimer />
     </div>
   );
 }
